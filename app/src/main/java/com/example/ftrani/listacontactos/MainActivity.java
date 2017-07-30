@@ -1,6 +1,8 @@
 package com.example.ftrani.listacontactos;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -16,6 +18,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ListView listaContactos;
+    private SwipeRefreshLayout sflLista;
     private Context context;
 
     @Override
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()){
             case R.id.mnuAdd:
+
                 Toast.makeText(context,"Hice clic!!",Toast.LENGTH_SHORT).show();
                 return true;
             default:
@@ -39,15 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        context = MainActivity.this;
-
-        listaContactos = (ListView) findViewById(R.id.lista_contactos);
-
+    private void cargarLista(){
         final List<Contacto> contactos = new ArrayList<>();
 
         contactos.add(new Contacto(15445566,"Carlos","Lopez"));
@@ -64,6 +60,19 @@ public class MainActivity extends AppCompatActivity {
         contactos.add(new Contacto(15998800,"Marta","Garcia"));
 
         listaContactos.setAdapter(new ContactoAdapter(contactos));
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        context = MainActivity.this;
+
+        listaContactos = (ListView) findViewById(R.id.lista_contactos);
+        sflLista = (SwipeRefreshLayout) findViewById(R.id.sflLista);
+
+        cargarLista();
 
         listaContactos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -72,7 +81,16 @@ public class MainActivity extends AppCompatActivity {
 
                 String leyenda = "Telefono: "+ item.getTelefono()+" - Nombre: " + item.getNombre() + ", "+item.getApellido();
 
-                Toast.makeText(context,leyenda,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context,leyenda,Toast.LENGTH_SHORT).show();
+                Snackbar.make(view,leyenda,Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        sflLista.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                cargarLista();
+                sflLista.setRefreshing(false);
             }
         });
 
